@@ -1,9 +1,9 @@
-﻿namespace qsharp
+﻿namespace progettoreti
 {
     open Microsoft.Quantum.Canon;
     open Microsoft.Quantum.Primitive;
 
-operation Set (desired: Result, q1: Qubit) : ()
+    operation Set (desired: Result, q1: Qubit) : ()
     {
         body
         {
@@ -15,55 +15,77 @@ operation Set (desired: Result, q1: Qubit) : ()
         }
     }
 
-    operation Grover () : (Int, Int)
+    operation Oracle(register: Qubit[]) : ()
+    {
+        body{
+            ApplyToEach(H,register);
+            //S(first);
+            //S(second);
+
+            H(register[1]);
+            CNOT(register[0], register[1]);
+            H(register[1]);
+
+            //S(first);
+            //S(second);
+            ApplyToEach(H,register);
+        }
+    }
+
+    
+
+    operation PerceptronOracle(register: Qubit[]) : ()
+    {
+        body{
+            ApplyToEach(H,register);
+            //S(first);
+            //S(second);
+
+            H(register[1]);
+            CNOT(register[0], register[1]);
+            H(register[1]);
+
+            //S(first);
+            //S(second);
+            ApplyToEach(H,register);
+        }
+    }    
+
+    operation Grover (register: Qubit[]) : ()
     {
         body
         {
-            mutable fmeasure = 0;
-            mutable smeasure = 0;
-      
+            ApplyToEach(X,register);
+            H(register[1]);
+            CNOT(register[0], register[1]);
+            H(register[1]);
+            ApplyToEach(X,register);
+            ApplyToEach(H,register);
+        }
+    }
+
+    operation Perceptron() : (Int, Int)
+    {
+        body{
+            mutable cregister = new Int[2];
+
             using(register = Qubit[2]){
-            let first = register[0];
-            let second = register[1];
+                Set(Zero, register[0]);
+                Set(Zero, register[1]);
 
-            Set(Zero, first);
-            Set(Zero, second);
+                //Cambio fasi con oracolo
+                Oracle(register);
 
-            H(first);
-            H(second);
-            S(first);
-            //S(second);
-
-            H(second);
-            CNOT(first, second);
-            H(second);
-
-            S(first);
-            //S(second);
-            H(first);
-            H(second);
-            
-            X(first);
-            X(second);
-            H(second);
-            CNOT(first, second);
-            H(second);
-            X(first);
-            X(second);
-            H(first);
-            H(second);
-
-            if(M(first) == One) {set fmeasure = 1;};
-            if(M(second) == One) {set smeasure = 1;};
-
-            // Reset all of the qubits that we used before releasing
-                // them.
+                //uso grover per fare ricerca
+                Grover(register);
+                
+                if(M(register[0]) == One) {set cregister[0] = 1;};
+                if(M(register[1]) == One) {set cregister[1] = 1;};
+                // Reset all of the qubits that we used before releasing them
                 ResetAll(register);
             }
 
-            return (fmeasure, smeasure);
-
+            return (cregister[0], cregister[1]);
         }
-
     }
 }
