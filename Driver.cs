@@ -10,30 +10,28 @@ namespace progettoreti
   class Driver
   {
 
-    void readfile(){
-      
-    }
-
     static void Main(string[] args)
         {
             var X = new List<double[]>();
             var d = new List<double>();
             int ndimensions = 2;
 
-            System.Console.WriteLine("Inizio progetto reti..");
-            System.Console.WriteLine("Leggo dati..");
+            Boolean RunOnIBM = false;
+
+            System.Console.WriteLine("\n************\nInizio progetto reti..");
+            System.Console.WriteLine("\nLeggo dati..");
             ReadFile(X, d);
 
-            var weights = new Double[ndimensions + 1];
+            if (RunOnIBM) IBMQuantumExperienceRun();
 
+            var weights = new Double[ndimensions + 1];
             using (var sim = new QuantumSimulator())
             {
-                System.Console.WriteLine("Running perceptron..");
+                System.Console.WriteLine("\nRunning perceptron..");
+                var (first, second, tot) = Perceptron.Run(sim,0,1).Result;
 
-                var (first, second) = Perceptron.Run(sim).Result;
-
-                System.Console.WriteLine($"first bit:\t {first}");
-                System.Console.WriteLine($"second bit:\t {second}");
+                System.Console.WriteLine($"first bit:\tOnes: {first / tot * 100}%\tZeroes: {(tot - first) / tot * 100}%");
+                System.Console.WriteLine($"second bit:\tOnes: {second / tot * 100}%\tZeroes: {(tot - second) / tot * 100}%");
                 weights[0] = 0;
                 weights[1] = first;
                 weights[2] = second;
@@ -43,9 +41,18 @@ namespace progettoreti
 
         }
 
+        private static void IBMQuantumExperienceRun()
+        {
+            System.Console.WriteLine("\n\nRunning on IBM..");
+            var apiKey = "";
+            var factory = new IbmQx5(apiKey); //Using different Factory
+            var result = OneShotPerceptron.Run(factory).Result;
+            System.Console.WriteLine($"Result of sim is {result}");
+        }
+
         private static void SaveFile(double[] weights)
         {
-            System.Console.WriteLine("Saving line..");
+            System.Console.WriteLine("\nSaving output..");
             using (var w = new StreamWriter("output.txt"))
             {
                 for (double x = -2.5; x <2.5; x+=0.1){
@@ -58,7 +65,7 @@ namespace progettoreti
 
         private static void ReadFile(List<double[]> X, List<double> d)
         {
-            System.Console.WriteLine("Reading file.txt");
+            System.Console.WriteLine("\nReading file.txt");
             using (var reader = new StreamReader("data.csv"))
             {
                 while (!reader.EndOfStream)

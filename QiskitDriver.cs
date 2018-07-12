@@ -1,8 +1,7 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
 using Microsoft.Quantum.Simulation.Core;
-using Microsoft.Quantum.Samples.OpenQasm;
 using System;
 using System.Collections.Generic;
 using System.Linq;
