@@ -16,11 +16,15 @@ namespace progettoreti
             var d = new List<double>();
             int ndimensions = 2;
 
-            Boolean RunOnIBM = false;
+            Boolean RunOnIBM = true;
 
             System.Console.WriteLine("\n************\nInizio progetto reti..");
+            Superposition();
+
             System.Console.WriteLine("\nLeggo dati..");
             ReadFile(X, d);
+
+            var superposition = new int[] { 1, 1 };
 
             if (RunOnIBM) IBMQuantumExperienceRun();
 
@@ -28,10 +32,10 @@ namespace progettoreti
             using (var sim = new QuantumSimulator())
             {
                 System.Console.WriteLine("\nRunning perceptron..");
-                var (first, second, tot) = Perceptron.Run(sim,0,1).Result;
+                var (first, second, tot) = Perceptron.Run(sim, superposition[0], superposition[1]).Result;
 
-                System.Console.WriteLine($"first bit:\tOnes: {first / tot * 100}%\tZeroes: {(tot - first) / tot * 100}%");
-                System.Console.WriteLine($"second bit:\tOnes: {second / tot * 100}%\tZeroes: {(tot - second) / tot * 100}%");
+                System.Console.WriteLine($"first bit:\tOnes: {(double) first / tot * 100}%\tZeroes: {(double)(tot - first) / tot * 100}%");
+                System.Console.WriteLine($"second bit:\tOnes: {(double) second / tot * 100}%\tZeroes: {(double)(tot - second) / tot * 100}%");
                 weights[0] = 0;
                 weights[1] = first;
                 weights[2] = second;
@@ -41,10 +45,22 @@ namespace progettoreti
 
         }
 
+        private static void Superposition()
+        {
+            using (var sim = new QuantumSimulator())
+            {
+                System.Console.WriteLine("\nEsempio sovrapposizione..");
+                var (first, second, tot) = SuperExample.Run(sim).Result;
+
+                System.Console.WriteLine($"first bit:\tOnes: {(double)first / tot * 100}%\tZeroes: {(double)(tot - first) / tot * 100}%");
+                System.Console.WriteLine($"second bit:\tOnes: {(double)second / tot * 100}%\tZeroes: {(double)(tot - second) / tot * 100}%");
+            }
+        }
+
         private static void IBMQuantumExperienceRun()
         {
             System.Console.WriteLine("\n\nRunning on IBM..");
-            var apiKey = "";
+            var apiKey = "API_KEY_HERE";
             var factory = new IbmQx5(apiKey); //Using different Factory
             var result = OneShotPerceptron.Run(factory).Result;
             System.Console.WriteLine($"Result of sim is {result}");
