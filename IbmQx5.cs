@@ -1,4 +1,4 @@
-namespace progettoreti
+namespace Qiskit
 {
     /*
      * Quick and dirty driver to enable the IbmQx4

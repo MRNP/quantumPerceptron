@@ -4,6 +4,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Web;
 using System;
+using Qiskit;
 
 namespace progettoreti
 {
@@ -16,7 +17,7 @@ namespace progettoreti
             var d = new List<double>();
             int ndimensions = 2;
 
-            Boolean RunOnIBM = true;
+            Boolean RunOnIBM = false;
 
             System.Console.WriteLine("\n************\nInizio progetto reti..");
             Superposition();
@@ -32,13 +33,15 @@ namespace progettoreti
             using (var sim = new QuantumSimulator())
             {
                 System.Console.WriteLine("\nRunning perceptron..");
-                var (first, second, tot) = Perceptron.Run(sim, superposition[0], superposition[1]).Result;
-
-                System.Console.WriteLine($"first bit:\tOnes: {(double) first / tot * 100}%\tZeroes: {(double)(tot - first) / tot * 100}%");
-                System.Console.WriteLine($"second bit:\tOnes: {(double) second / tot * 100}%\tZeroes: {(double)(tot - second) / tot * 100}%");
+                var (classical_register, tot) = Perceptron.Run(sim, superposition[0], superposition[1]).Result;
+                int i = 0;
+                foreach(int bit in classical_register){
+                    System.Console.WriteLine($"bit {i}:\tOnes: {(double) bit / tot * 100}%\tZeroes: {(double)(tot - bit) / tot * 100}%");
+                    i++;
+                }
                 weights[0] = 0;
-                weights[1] = first;
-                weights[2] = second;
+                weights[1] = (double) classical_register[0] / tot;
+                weights[2] = (double) classical_register[1] / tot;
             }
 
             SaveFile(weights);
@@ -60,7 +63,7 @@ namespace progettoreti
         private static void IBMQuantumExperienceRun()
         {
             System.Console.WriteLine("\n\nRunning on IBM..");
-            var apiKey = "API_KEY_HERE";
+            var apiKey = "YOUR_API_KEY..";
             var factory = new IbmQx5(apiKey); //Using different Factory
             var result = OneShotPerceptron.Run(factory).Result;
             System.Console.WriteLine($"Result of sim is {result}");

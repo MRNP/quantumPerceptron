@@ -10,7 +10,7 @@ using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.Simulators;
 using Microsoft.Quantum.Simulation.Common;
 
-namespace progettoreti
+namespace Qiskit
 {
     /// <summary>
     /// Quick and dirty Simulatorbase to write OpenQASM 2.0
