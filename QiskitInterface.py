@@ -21,18 +21,17 @@ qasms = [{ 'qasm': qasm}]
 job = api.run_job(qasms, backend=backend, shots=shots, max_credits=3)
 if 'id' in job:
     jobid = job['id']
-    print(" JobID:", jobid);
+    print(" JobID:", jobid)
     status = job['status']
-    timeQueue = job['infoQueue']['estimatedTimeInQueue']
-    print(" Expected time (minutes) in Queue left:", timeQueue/60)
-    if timeQueue < 60:
+    print (" Job", job)
+    timePos = job['infoQueue']['position']
+    print(" Expected position (minutes) in Queue left:", timePos)
+    if timePos < 10:
        while status == 'RUNNING':
-          time.sleep(10)
+          time.sleep(30)
           job = api.get_job(jobid)
           position = job['infoQueue']['position']
           print(" Position in Queue", position)
-          timeQueue = job['infoQueue']['estimatedTimeInQueue']
-          print(" Expected time (minutes) in Queue left:", timeQueue/60)
           status = job['status']
        id = job['qasms'][0]['executionId']
        result = api.get_result_from_execution(id)
